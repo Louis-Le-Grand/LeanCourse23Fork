@@ -1,4 +1,4 @@
-import Mathlibimport Mathlib
+import Mathlib
 --import Mathlib.LinearAlgebra.FiniteDimensional
 --import Mathlib.Data.Polynomial.RingDivision
 --import Mathlib.Analysis.SpecialFunctions.Pow --! Warum wird das nicht gefunden https://github.com/leanprover-community/mathlib4/blob/8666bd82efec40b8b3a5abca02dc9b24bbdf2652/Mathlib/Analysis/SpecialFunctions/Pow/NNReal.lean#L328-L330
