@@ -1,11 +1,11 @@
 import Mathlib
 
 set_option autoImplicit true
+open Polynomial
 open FiniteDimensional Polynomial
 open scoped Classical Polynomial
 
 --! This is a test whit use using ℂs and instead Complex numbers
-
 
 def G (z₁ z₂ : ℂ): Set ℂ := {z : ℂ | ∃ r : ℝ, z = ((r : ℂ) * z₁ + 1 - r * z₂)}
 def C (z₁ : ℂ) (r : ℝ): Set ℂ := {z : ℂ | (z.re - z₁.re) ^ 2 + ( z.im -  z₁.im) ^ 2 = r}
@@ -38,7 +38,6 @@ z ∈ M_inf M ↔
   case mpr => sorry
 
 
-
 lemma Classfication_z_in_M_inf_2m (M : Set ℂ) (z : ℂ) :
   z ∈ M_inf M ↔ ∃ (m : ℕ) ,((2  : ℕ) ^ m : WithBot ℕ) = Polynomial.degree (minpoly (K_zero M) z) := by
   constructor
@@ -54,7 +53,31 @@ def is_complex_rational (z : ℂ) : Prop :=
 lemma K_zero_eq_rational_if_M_sub_Q (M : Set ℂ) (h : M ⊆ {z : ℂ | is_complex_rational z}) : K_zero M = ℚ := by
   sorry
   --Todo ask how to use this: apply IntermediateField.adjoin_le_subfield or IntermediateField.adjoin_le_iff
-#check IntermediateField.adjoin_le_subfield
+--#check IntermediateField.adjoin_le_subfield
+
+/- --! This is are helper lemmas to show irreducibility of polynomials: https://leanprover.zulipchat.com/#narrow/stream/113489-new-members/topic/Polynomial.20irreducible/near/412616130
+theorem irreducible_iff_lt_natDegree_lt {R} [CommSemiring R] [NoZeroDivisors R]
+    {p : R[X]} (hp : p.Monic) (hp1 : p ≠ 1) :
+    Irreducible p ↔ ∀ q, Monic q → natDegree q ∈ Finset.Ioc 0 (natDegree p / 2) → ¬ q ∣ p := by
+  rw [hp.irreducible_iff_natDegree', and_iff_right hp1]
+  constructor
+  · rintro h g hg hdg ⟨f, rfl⟩
+    exact h f g (hg.of_mul_monic_left hp) hg (mul_comm f g) hdg
+  · rintro h f g - hg rfl hdg
+    exact h g hg hdg (dvd_mul_left g f)
+
+theorem irreducible_iff_roots_eq_zero_of_degree_le_three {R} [CommRing R] [IsDomain R]
+    {p : R[X]} (hp : p.Monic)
+    (hp2 : 2 ≤ p.natDegree) (hp3 : p.natDegree ≤ 3) : Irreducible p ↔ p.roots = 0 := by
+  rw [irreducible_iff_lt_natDegree_lt hp]; swap
+  · rintro rfl; rw [natDegree_one] at hp2; cases hp2
+  have hp0 : p ≠ 0 := by rintro rfl; rw [natDegree_zero] at hp2; cases hp2
+  simp_rw [show p.natDegree / 2 = 1 from (Nat.div_le_div_right hp3).antisymm
+    (by apply Nat.div_le_div_right (c := 2) hp2), show Finset.Ioc 0 1 = {1} from rfl,
+    Finset.mem_singleton, Multiset.eq_zero_iff_forall_not_mem, mem_roots hp0, ← dvd_iff_isRoot]
+  refine ⟨fun h r ↦ h _ (monic_X_sub_C r) (natDegree_X_sub_C r), fun h q hq hq1 ↦ ?_⟩
+  rw [hq.eq_X_add_C hq1, ← sub_neg_eq_add, ← C_neg]; apply h
+ -/
 
 section constructionDoubleCube
 noncomputable def P : (Polynomial ℚ) := monomial 3 1 - 2 -- x^3 - 2
@@ -63,14 +86,25 @@ noncomputable def P' : (Polynomial ℚ) := X ^ 3 - 2 -- x^3 - 2
 lemma P_eqq : P = P' := by simp[P, P']; symm; apply Polynomial.X_pow_eq_monomial
 
 
-/- lemma P_irreducible : Irreducible P := by --! Uses X_pow_sub_C_irreducible_of_prime with is to new
+/- lemma P_irreducible : Irreducible P := by -- Uses X_pow_sub_C_irreducible_of_prime with is to new
   rw[P_eqq]
   apply X_pow_sub_C_irreducible_of_prime
-  . sorry -- 3 is prime
+  . apply Nat.prime_three
   by_contra h
   simp at h
   obtain ⟨x,h⟩  := h
-  sorry -/
+  apply irrational_nrt_of_notint_nrt (x := x) (n := 3) (m := 2)
+  . norm_cast
+  . norm_num
+    intro y
+    have hx: (x:ℝ) = (2:ℚ) ^ (1/3:ℝ):= by
+      calc (x:ℝ) = x ^ (3:ℝ) ^ (1/3:ℝ):= by simp; sorry --!apply Real.pow_nat_rpow_nat_inv
+        _ = (2:ℚ) ^ (1/3:ℝ) := by sorry -- cast_real at h; rw[h]
+    rw[hx]
+    sorry
+  . norm_num
+  . simp -/
+
 
 lemma second_P_irreducible : Irreducible P := by -- X_pow_sub_C_irreducible_of_prime
   rw[Polynomial.Monic.irreducible_iff_natDegree']
@@ -82,12 +116,16 @@ lemma second_P_irreducible : Irreducible P := by -- X_pow_sub_C_irreducible_of_p
       by_contra h
       have hp : natDegree P = 3 := by sorry
       simp[hp] at h
-      have h1 : natDegree g = 1 := by sorry
-      have hr : ∃ (x : ℚ), Polynomial.IsRoot P x := by
+      have h1 : Polynomial.degree g = 1 := by sorry
+      have hnr : ¬ ∃ (x : ℚ), Polynomial.IsRoot P x := by
         rw[←hfg]
         --use x
         --rw[Polynomial.root_mul] --Polynomial.exists_root_of_degree_eq_one
         sorry
+      have hr : ∃ (x : ℚ) , Polynomial.IsRoot P x := by
+        rw[←hfg]
+        sorry
+        --exact Polynomial.root_mul (Polynomial.exists_root_of_degree_eq_one  h1)
       sorry
   rw[P_eqq]; rw[Polynomial.Monic.def]; apply monic_X_pow_sub_C; simp
 
@@ -127,9 +165,9 @@ noncomputable def H' : Polynomial ℚ := 8 * X ^ 3 - 6 * X - 1 -- 8x^3 - 6x - 1 
 noncomputable def H_monic : Polynomial ℚ := monomial 3 1 - monomial 1 6/8 - 1/8 -- x^3 - 6/8 x - 1/8
 noncomputable def H_monic' : Polynomial ℚ := X ^ 3 - 6/8 * X - 1/8 -- x^3 - 6/8 x - 1/8
 
-lemma H_irreducible : Irreducible H_monic := sorry --! Use den_dvd_of_is_root as Rational root theorem
-
 lemma H_monic_eqq : H_monic = H_monic' := by simp[H_monic, H_monic']; sorry-- apply div_eqq_iff apply Polynomial.X_pow_eq_monomial
+
+lemma H_irreducible : Irreducible H_monic := sorry --! Use den_dvd_of_is_root as Rational root theorem
 
 lemma exp_pi_ninth : Polynomial.degree (minpoly ℚ (Complex.exp ((Real.pi/3)/3) : ℂ)) = 3:=
   have h: minpoly ℚ ((2 : ℝ) ^ (1/3)) = H_monic := by
