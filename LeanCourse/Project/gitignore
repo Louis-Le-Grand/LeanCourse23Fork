@@ -1,5 +1,0 @@
-#Latex
-*.out
-
-#Lean Test
-test.lean
