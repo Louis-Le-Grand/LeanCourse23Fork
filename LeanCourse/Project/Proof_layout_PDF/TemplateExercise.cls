@@ -53,6 +53,7 @@
 \RequirePackage{soul}
 \RequirePackage{stmaryrd}
 \RequirePackage{tabularx}
+\RequirePackage{url}
 \RequirePackage[most]{tcolorbox}
 \usetikzlibrary{calc}
 \RequirePackage{tkz-euclide}
@@ -176,13 +177,16 @@
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollar}
+\newtheorem{problem}[theorem]{Problem}
+
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
-\newtheorem{problem}[theorem]{Problem}
+
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
 \numberwithin{equation}{section}
 \numberwithin{theorem}{section}
+
 
 %%%% MISC %%%%
 

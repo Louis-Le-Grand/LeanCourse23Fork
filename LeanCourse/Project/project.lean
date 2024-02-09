@@ -23,7 +23,7 @@ def M_inf (M : Set ℂ) : Set ℂ := ⋃ n : ℕ, M_I M n
 
 noncomputable def K_zero (M : Set ℂ) : IntermediateField ℚ  ℂ := IntermediateField.adjoin ℚ ({(z : ℂ)  | z ∈ M} ∪ {(starRingEnd ℂ) z  | z ∈ M})
 
-lemma ABC2(M : Set ℂ):  x.re ∉ M_inf M → x ∉ M_inf M := by sorry
+lemma real_component_in_M_inf(M : Set ℂ):  x.re ∉ M_inf M → x ∉ M_inf M := by sorry
 
 
 theorem Classfication_z_in_M_inf (M : Set ℂ) (z : ℂ) :
@@ -414,7 +414,7 @@ lemma exp_pi_ninth : Polynomial.degree (minpoly ℚ (Real.cos ((Real.pi/3)/3): �
 
 lemma pi_third_not_in_M_inf (M := {⟨0,0⟩ ,⟨1,0⟩,  Complex.exp (Complex.I *Real.pi/3) }) :
   (Complex.exp (Complex.I * (Real.pi/3)/3) : ℂ) ∉ M_inf M := by
-  apply ABC2
+  apply real_component_in_M_inf
   apply short
   simp
   intro x
