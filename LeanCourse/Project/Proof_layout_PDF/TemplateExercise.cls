@@ -53,7 +53,7 @@
 \RequirePackage{soul}
 \RequirePackage{stmaryrd}
 \RequirePackage{tabularx}
-\RequirePackage{url}
+\RequirePackage{xurl}
 \RequirePackage[most]{tcolorbox}
 \usetikzlibrary{calc}
 \RequirePackage{tkz-euclide}
