@@ -2,10 +2,10 @@
 
 Please fill out the following:
 ```
-First & last name:
-Uni-ID:
+First & last name: Ludwig Monnerjan
+Uni-ID: s6lumonn
 ```
-
+Also all changes after 09.02.24 are in branch current.
 ## Your own project
 
 During the second half of the course you will work on a project in any area of mathematics of your choice. You can put your project files in this folder.
